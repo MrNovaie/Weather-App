@@ -386,9 +386,9 @@ function displayForecast(forecastData, sunriseTimestamp, sunsetTimestamp) { /* T
             const forecastCard = document.createElement('div');
             forecastCard.className = 'forecastCard';
             forecastCard.innerHTML = `
-                <p>${date.toLocaleString('en-US', { timeZone: destinationTimeZone })} ${timezoneString}</p>
+                <p class="forecastTime">${date.toLocaleString('en-US', { timeZone: destinationTimeZone })} ${timezoneString}</p>
                 <div class="iconDisplay-forecast">${emoji}</div>
-                <p>${temperature}°C</p>
+                ${temperature > 20 ? `<p style="color: #e02900; font-weight: bold;">${temperature}°C</p>` : `<p style="color: #003ec5; font-weight: bold;">${temperature}°C</p>`}
             `;
             forecastDiv.appendChild(forecastCard);
             forecastDiv.style.display = 'flex';
