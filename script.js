@@ -11,6 +11,7 @@ const geoApiKey = '47762054b9f542af8f08c6840e9bab88';
 const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Singapore';
 let destinationTimeZone = 'UTC'; // Initialize with default
 let timezoneString = 'UTC'; // Initialize with default
+let timezoneOffsetHours = 0; // Initialize with default
 
 
 // Current time widget for user's time
@@ -304,7 +305,7 @@ function displayWeather(data) {
     const pressureMmHg = Math.round(main.pressure * 0.750062); // Convert hPa to mmHg
     const weatherDescription = `${weather[0].main}, ${timeOfDay}`; // This combines the weather condition with whether it's currently day or night.
     const dateRetrieved = new Date(data.dt * 1000); // Convert Unix timestamp to JavaScript Date object
-    const timezoneOffsetHours = data.timezone / 3600;
+    timezoneOffsetHours = data.timezone / 3600;
     timezoneString = `UTC${timezoneOffsetHours >= 0 ? '+' : ''}${timezoneOffsetHours}`;
     destinationTimeZone = toValidIANA(timezoneString); // Convert to "valid" (it's a simplification which does not account for DST) IANA timezone format for display and time conversion
     resultsDiv.innerHTML = `
@@ -366,7 +367,7 @@ async function getForecastData(city) { /* This function is used to fetch 5-day w
 // Function to determine if a forecast entry is during the day or night based on its timestamp (using UTC time for simplicity)
 function isDayInForecast(forecastTimestamp) {
     const date = new Date(forecastTimestamp * 1000);
-    const hour = date.getUTCHours(); // We use getUTCHours() because the forecast timestamps are in UTC, so we need to get the hour in UTC to determine if it's day or night for that forecast entry. This way, we can show the appropriate emoji for each forecast entry based on whether it will be day or night at that time.
+    const hour = date.getUTCHours() + timezoneOffsetHours; // We use getUTCHours() because the forecast timestamps are in UTC, so we need to get the hour in UTC to determine if it's day or night for that forecast entry. This way, we can show the appropriate emoji for each forecast entry based on whether it will be day or night at that time.
     console.log("Forecast UTC time:", forecastTimestamp, "Hour:", hour);
     return hour >= 6 && hour < 18; // 6 AM to 6 PM = day, rest = night
 }
