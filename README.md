@@ -60,7 +60,7 @@ Works on all modern browsers (Chrome, Firefox, Safari, Edge)
 
 ---
 
-**Last Updated:** March 2026
+**Last Updated:** 21 March 2026 (v1.0 complete)
 
 ---
 
