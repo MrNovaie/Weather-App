@@ -7,10 +7,38 @@ const forecastDiv = document.querySelector('.forecastContainer');
 const apiKey = '9b85f2e58dfca8a92b60014d4485d6da';
 const geoApiKey = '47762054b9f542af8f08c6840e9bab88'; 
 
+// User timezone detection
+const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Singapore';
+let destinationTimeZone = 'UTC'; // Initialize with default
+let timezoneString = 'UTC'; // Initialize with default
 
-//Initial check for geolocation support (for potential future use of geolocation features)
+
+// Current time widget for user's time
+const usertimeWidget = document.createElement('div');
+usertimeWidget.id = 'timeWidget';
+usertimeWidget.style.cssText = 'position: fixed; top: 10px; right: 10px; font-size: 16px; color: #333; background: rgba(203, 255, 194, 0.8); padding: 5px; border-radius: 5px; z-index: 1000;';
+document.body.appendChild(usertimeWidget);
+
+//Destination time widget for destination time
+const destinationTimeWidget = document.createElement('div');
+destinationTimeWidget.id = 'destinationTimeWidget';
+destinationTimeWidget.style.cssText = 'position: fixed; top: 60px; right: 10px; font-size: 16px; color: #333; background: rgba(255, 190, 190, 0.8); padding: 5px; border-radius: 5px; z-index: 1000;';
+document.body.appendChild(destinationTimeWidget);
+
+//Function to update time widgets
+async function updateTimeWidget() {
+    await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to ensure destinationTimeZone is updated before first display
+    usertimeWidget.textContent = `Your Current Time: ${new Date().toLocaleString()}`;
+    destinationTimeWidget.textContent = `Destination Time: ${new Date().toLocaleString(undefined, { timeZone: destinationTimeZone })}`;
+
+}
+
+setInterval(updateTimeWidget, 1000);
+updateTimeWidget();
 
 
+
+// Geolocation functions
 function initializeGeolocation() {
     // Check if coordinates already stored
     const savedLocation = localStorage.getItem('userLocation');
@@ -38,23 +66,23 @@ function initializeGeolocation() {
     }
 }
 
-function getWeatherByCoordinates(lat, lon) {
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`;
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch weather data');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Process the weather data
-            displayWeather(data);
-        })
-        .catch(error => {
-            console.error('Error fetching weather data:', error);
-            displayError('Failed to fetch weather data.');
-        });
+//Function to get weather at user location
+async function getWeatherByCoordinates(lat, lon) {
+    try {
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+        const response = await fetch(apiUrl);
+        
+        if (!response.ok) {
+            displayError('Unable to fetch weather for your location.');
+            return;
+        }
+        
+        const data = await response.json();
+        displayWeather(data);
+    } catch (error) {
+        displayError('An error occurred. Please check your connection.');
+        console.error('Geolocation weather fetch error:', error);
+    }
 }
 
 
@@ -113,6 +141,7 @@ if (weatherForm && cityInput) {
     });
 }
 
+// Recent searches functions
 function saveToRecentSearches(city) {
     let recentSearches = JSON.parse(localStorage.getItem('recentSearchesList')) || [];
     // Remove city if it already exists to avoid duplicates
@@ -123,7 +152,7 @@ function saveToRecentSearches(city) {
     displayRecentSearches(recentSearches);
 }
 
-function displayRecentSearches(recentSearches) { //Does this work if i put recentSearches as a parameter? Yes, it works because we are passing the recentSearches array as an argument to the displayRecentSearches function when we call it from saveToRecentSearches. This way, we can update the recent searches list in the UI immediately after saving a new search to localStorage, without needing to fetch it again from localStorage inside the displayRecentSearches function. The recentSearches parameter allows us to directly use the updated list of recent searches that we just saved, ensuring that the UI reflects the most current data.
+function displayRecentSearches(recentSearches) {
     const recentSearchesContainer = document.querySelector('.recentSearchesContainer');
     const recentSearchesList = document.querySelector('.recentSearchesList');
     recentSearchesList.innerHTML = ''; // Clear existing list
@@ -149,7 +178,7 @@ if (document.querySelector('.clearHistoryBtn')) {
     document.querySelector('.clearHistoryBtn').addEventListener('click', clearRecentSearches);
 }
 
-// Initialize modal event listeners only if modal elements exist
+// Error modal functions
 if (errorModal && closeErrorBtn) {
     closeErrorBtn.addEventListener('click', hideErrorModal);
     
@@ -166,7 +195,7 @@ if (errorModal && closeErrorBtn) {
     });
 }
 
-// Function to show error modal
+
 function showErrorModal(message) {
     if (errorMessage && errorModal) {
         errorMessage.textContent = message;
@@ -174,14 +203,14 @@ function showErrorModal(message) {
     }
 }
 
-// Function to hide error modal
+
 function hideErrorModal() {
     if (errorModal) {
         errorModal.style.display = 'none';
     }
 }
 
-// Display error using modal (replaces old inline error display)
+
 function displayError(message) {
     showErrorModal(message);
 }
@@ -211,6 +240,7 @@ async function getWeatherData(city) {
     }
 }
 
+// Fetch city suggestions from Geoapify API for autocomplete
 async function fetchCitySuggestions(searchTerm) {
     const dropdown = document.querySelector('.predictionsContainer');
     try {
@@ -243,35 +273,51 @@ async function fetchCitySuggestions(searchTerm) {
 
 // Function to determine if it's currently daytime based on sunrise/sunset times
 function isDaytime(sunriseTimestamp, sunsetTimestamp) {
-    // Both Date.now() and sunrise/sunset from API are in UTC, so we can compare directly
+    // Both Date.now() and sunrise/sunset from API are in UTC time, so we can compare directly
     const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-    console.log("Current UTC time:", currentTimeInSeconds, "Sunrise:", sunriseTimestamp, "Sunset:", sunsetTimestamp);
     return currentTimeInSeconds >= sunriseTimestamp && currentTimeInSeconds < sunsetTimestamp;
 }
 
+//Function to convert UTC timestamp to local time using timezone offset
+function timezoneConvert(utcTimestamp, timezoneOffset) {
+    const localTimestamp = utcTimestamp + timezoneOffset;
+    return new Date(localTimestamp * 1000); // Convert to milliseconds
+}
 
+//Function to convert the timeZones to valid IANA formatting (to be passed into .toLocaleTimeString)
+function toValidIANA(utcStr) {
+  // Reverses the sign for Etc/GMT format
+  const offset = parseInt(utcStr.replace('UTC', ''));
+  const sign = offset >= 0 ? '-' : '+';
+  return `Etc/GMT${sign}${Math.abs(offset)}`;
+}
 
-// Display weather data in the results div
+// Function to display weather data in the results div
 function displayWeather(data) {
     if (!resultsDiv) return;
     
     const { name, main, weather, wind, pressure, sys } = data; 
     const temperature = Math.round(main.temp - 273.15);
-    const isDay = isDaytime(sys.sunrise, sys.sunset);
-    const emoji = getWeatherEmoji(weather[0].id, isDay);
-    const weatherClass = getWeatherClass(weather[0].id, isDay);
-    const timeOfDay = isDay ? 'Day' : 'Night';
+    const emoji = getWeatherEmoji(weather[0].id, isDaytime(sys.sunrise, sys.sunset));
+    const weatherClass = getWeatherClass(weather[0].id, isDaytime(sys.sunrise, sys.sunset));
+    const timeOfDay = isDaytime(sys.sunrise, sys.sunset) ? 'Day' : 'Night';
     const pressureMmHg = Math.round(main.pressure * 0.750062); // Convert hPa to mmHg
     const weatherDescription = `${weather[0].main}, ${timeOfDay}`; // This combines the weather condition with whether it's currently day or night.
-
+    const dateRetrieved = new Date(data.dt * 1000); // Convert Unix timestamp to JavaScript Date object
+    const timezoneOffsetHours = data.timezone / 3600;
+    timezoneString = `UTC${timezoneOffsetHours >= 0 ? '+' : ''}${timezoneOffsetHours}`;
+    destinationTimeZone = toValidIANA(timezoneString); // Convert to "valid" (it's a simplification which does not account for DST) IANA timezone format for display and time conversion
     resultsDiv.innerHTML = `
-        <p id="cityDisplay"><h1 style="color: #00b1acdf;">${name}</h1>, <h1 style="color: #8c038a;">${sys.country}</h1></p>
+        <p id="cityDisplay"><h1 style="color: #00b1ac;">${name}</h1>, <h1 style="color: #8c038a;">${sys.country}</h1></p>
         <div class="iconDisplay">${emoji}</div>
         <div class="tempDisplay">${temperature}°C</div>
         <p class="descriptionDisplay">${weatherDescription}</p>
         <p class="humidityDisplay">Humidity: ${main.humidity}%</p>
         <p class="windDisplay">Wind Speed: ${wind.speed} m/s</p>
         <p class="pressureDisplay">Pressure: ${pressureMmHg} mmHg</p>
+        <p class="sunriseDisplay">Sunrise: ${new Date(sys.sunrise * 1000).toLocaleTimeString('en-US', { timeZone: destinationTimeZone })} ${timezoneString}</p>
+        <p class="sunsetDisplay">Sunset: ${new Date(sys.sunset * 1000).toLocaleTimeString('en-US', { timeZone: destinationTimeZone })} ${timezoneString}</p>
+        <p class="updateTimeDisplay">Weather data last updated on: ${dateRetrieved.toLocaleString()} (Local Time)</p>
     `;
     resultsDiv.className = `weatherResult ${weatherClass}`;
     resultsDiv.style.display = 'flex';
@@ -291,8 +337,9 @@ function getWeatherClass(weatherId, isDay) {
     if (weatherId >= 801 && weatherId <= 899) return isDay ? 'weather-clouds-day' : 'weather-clouds-night';
     return 'weather-default';
 }
+
 // Get emoji based on weather ID from OpenWeather API
-function getWeatherEmoji(weatherId, isDay) { //how do we know what weatherId means? Because the OpenWeather API documentation provides a list of weather condition codes (IDs) that correspond to different weather phenomena, so we can use those codes to determine which emoji to display for each weather condition.
+function getWeatherEmoji(weatherId, isDay) { //The OpenWeather API documentation provides a list of weather condition codes (IDs) that correspond to different weather phenomena, so we can use those codes to determine which emoji to display for each weather condition.
     if (weatherId >= 200 && weatherId <= 299) return '⛈️'; // Thunderstorm
     if (weatherId >= 300 && weatherId <= 399) return '🌧️'; // Drizzle
     if (weatherId >= 500 && weatherId <= 599) return '🌧️'; // Rain
@@ -316,6 +363,7 @@ async function getForecastData(city) { /* This function is used to fetch 5-day w
     }
 }
 
+// Function to determine if a forecast entry is during the day or night based on its timestamp (using UTC time for simplicity)
 function isDayInForecast(forecastTimestamp) {
     const date = new Date(forecastTimestamp * 1000);
     const hour = date.getUTCHours(); // We use getUTCHours() because the forecast timestamps are in UTC, so we need to get the hour in UTC to determine if it's day or night for that forecast entry. This way, we can show the appropriate emoji for each forecast entry based on whether it will be day or night at that time.
@@ -323,20 +371,21 @@ function isDayInForecast(forecastTimestamp) {
     return hour >= 6 && hour < 18; // 6 AM to 6 PM = day, rest = night
 }
 
+// Function to display forecast data in the forecast div
 function displayForecast(forecastData, sunriseTimestamp, sunsetTimestamp) { /* This function is used to display the 5-day weather forecast data that is fetched by the getForecastData function. It takes the forecast data as input and processes it to extract relevant information such as temperature, weather conditions, and timestamps for each forecast entry. The function then generates HTML content to display this information in a user-friendly format, such as a list or grid of forecast cards, and inserts it into the appropriate section of the UI. */
     if (!forecastDiv || !forecastData) return;
     try {
         forecastDiv.innerHTML = '<h2><b>Next 24 Hours</b></h2>';
         const nextForecasts = forecastData.list.slice(0, 8); // Show only next 24 hours (8 x 3-hour intervals)
         nextForecasts.forEach(forecast => {
-            const date = new Date(forecast.dt * 1000); // Convert Unix timestamp to JavaScript Date
+            const date = new Date(forecast.dt * 1000); // UTC timestamp
             const temperature = Math.round(forecast.main.temp - 273.15);
             const weatherId = forecast.weather[0].id;
-            const emoji = getWeatherEmoji(weatherId, isDayInForecast(forecast.dt)); // We can determine if it's day or night for the forecast time by comparing the forecast timestamp with the sunrise and sunset timestamps for that day, which we can get from the current weather data. This way, we can show the appropriate emoji for each forecast entry based on whether it will be day or night at that time.
+            const emoji = getWeatherEmoji(weatherId, isDayInForecast(forecast.dt)); // Keep UTC-based day/night for simplicity
             const forecastCard = document.createElement('div');
             forecastCard.className = 'forecastCard';
             forecastCard.innerHTML = `
-                <p>${date.toLocaleString()}</p>
+                <p>${date.toLocaleString('en-US', { timeZone: destinationTimeZone })} ${timezoneString}</p>
                 <div class="iconDisplay-forecast">${emoji}</div>
                 <p>${temperature}°C</p>
             `;
@@ -349,10 +398,4 @@ function displayForecast(forecastData, sunriseTimestamp, sunsetTimestamp) { /* T
     }
 }
 
-
-
-// Questions:
-// 1. What is the 0000 point of the clock used for sunrise/sunset comparison? The 0000 point of the clock, also known as the Unix epoch, is January 1, 1970, at 00:00:00 UTC. The OpenWeather API provides sunrise and sunset times as Unix timestamps, which represent the number of seconds that have elapsed since this epoch time. By comparing the current time (also converted to a Unix timestamp) with the sunrise and sunset timestamps, we can determine if it's currently day or night in the city.
-// Follow-up: Won't there be a lot of seconds? Yes, there will be a large number of seconds since the epoch, but that's perfectly normal for Unix timestamps. For example, as of June 2024, the current Unix timestamp is around 1.7 billion seconds. The important thing is that all timestamps (current time, sunrise, and sunset) are in the same format (seconds since the epoch), so we can directly compare them to determine if it's day or night without worrying about the actual number of seconds.
-
-// 2. Do we need to handle for timezones when comparing sunrise/sunset with current time? No, we do not need to handle timezones separately in this case because the OpenWeather API provides sunrise and sunset times in UTC as Unix timestamps. When we get the current time using `Date.now()`, it also gives us the time in UTC as a Unix timestamp. Since both the sunrise/sunset times and the current time are in the same format and timezone (UTC), we can directly compare them without needing to convert for timezones.
+//END CODE.
