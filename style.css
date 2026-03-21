@@ -305,10 +305,22 @@ p {
 
 /* Add styles for forecast cards */
 .forecastCard {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 255, 128, 0.153);
     margin: 10px;
     padding: 20px;
     border-radius: 10px;
+}
+
+.forecastCard h3 {
+    margin: 0;
+    font-size: 1.75rem;
+    color: #000000;
+}
+
+.forecastTime {
+    font-size: 1.5rem;
+    padding: 5px 0;
+    background-color: rgba(255, 255, 255, 0.20);
 }
 
 /*error display styles*/
