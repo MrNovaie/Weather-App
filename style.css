@@ -214,6 +214,77 @@ p {
     margin-top: 10px;
 } 
 
+/* Add styles for the time widget */
+#timeWidget {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #f0f0f0;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#timeWidget:hover {
+    background: rgba(0, 255, 47, 0.50);
+    box-shadow: 3px 4px 12px rgba(6, 33, 0, 0.4);
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+
+#destinationTimeWidget {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #f0f0f0;
+    font-weight: bold;
+    font-size: 1.5rem;
+    box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.2);
+}
+#destinationTimeWidget:hover {
+    background-color: rgba(255, 255, 255, 0.50);
+    box-shadow: 3px 4px 12px rgba(85, 0, 0, 0.4);
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+
+/* Add styles for the timezone display */
+.sunriseDisplay {
+    padding: 10px 20px;
+    background-color: rgba(255, 234, 0, 0.1);
+    color: #dbd700;
+    font-weight: bold;
+    font-size: 1.25rem;
+    margin-top: 10px;
+}
+.sunsetDisplay {
+    padding: 10px 20px;
+    background-color: rgba(255, 230, 0, 0.1);
+    color: #727200;
+    font-weight: bold;
+    font-size: 1.25rem;
+    margin-top: 10px;
+}
+
+.updateTimeDisplay {
+    padding: 10px 20px;
+    background-color: rgba(255, 0, 0, 0.1);
+    color: #ff7878;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-top: 10px;
+}
+
+/* Add styles for the forecast section */
+.forecastTitle {
+    font-size: 2.5rem;
+    color: #a6a6a6;
+    margin-bottom: 20px;
+}
+
 /*Forecast Styles*/
 .forecastContainer {
     margin-top: 30px;
