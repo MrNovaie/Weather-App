@@ -26,6 +26,16 @@ Made during National Service on my laptop computer!
 - Coordinates cached to avoid repeated geolocation requests
 - Clear history button available
 
+5. Time widgets 🕛
+- Fixed-position current time display (follows user on scroll)
+- Destination time display showing city's local time based on timezone offset
+- Real-time updates every second
+- Timezone information displayed with sunrise/sunset times
+   
+6. Timezone error handling and improved UI ⚠️
+- Modal error display for network issues, invalid cities, or API failures
+- Graceful fallbacks and user-friendly messages
+- Console logging for debugging
 
 ## Tech Stack
 
