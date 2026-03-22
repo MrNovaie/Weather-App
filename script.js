@@ -323,7 +323,7 @@ function displayWeather(data) {
     timezoneString = `UTC${timezoneOffsetHours >= 0 ? '+' : ''}${timezoneOffsetHours}`;
     destinationTimeZone = toValidIANA(timezoneString); // Convert to "valid" (it's a simplification which does not account for DST) IANA timezone format for display and time conversion
     resultsDiv.innerHTML = `
-        <p id="cityDisplay"><h1 style="color: #00b1ac;">${name}</h1>, <h1 style="color: #8c038a;">${sys.country}</h1></p>
+        <p id="cityDisplay"><h1 style="color: #00b1ac;">${name}</h1> <h1 style="color: #8c038a;">${sys.country}</h1></p>
         <div class="iconDisplay">${emoji}</div>
         <div class="tempDisplay">${temperature}°C</div>
         <p class="descriptionDisplay">${weatherDescription}</p>
