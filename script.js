@@ -103,12 +103,15 @@ if (weatherForm && cityInput) {
     const savedSearches = JSON.parse(localStorage.getItem('recentSearchesList')) || [];
     displayRecentSearches(savedSearches); // Display saved recent searches on page load
     weatherForm.addEventListener('submit', async event => {
-        event.preventDefault();
+        event.preventDefault(); // Prevent form from submitting and refreshing the page
         const city = cityInput.value.trim();
-        
         if (city) {
+            resultsDiv.classList.remove('animate');
+            forecastDiv.classList.remove('animate--slow');
             const success = await getWeatherData(city);
             if (success) {
+                resultsDiv.classList.add('animate'); // Re-add animation class to trigger animation
+                forecastDiv.classList.add('animate--slow'); // Re-add animation class to trigger animation
                 saveToRecentSearches(city);
             }
         } else {
@@ -134,8 +137,14 @@ if (weatherForm && cityInput) {
         if (event.target.value) { // Check if a valid option is selected (not the placeholder)
             cityInput.value = event.target.value; // Fill input with selected value
             dropdown.style.display = 'none'; // Hide dropdown
+            resultsDiv.classList.remove('animate'); // Remove animation class to allow re-triggering
+            forecastDiv.classList.remove('animate--slow'); // Remove animation class to allow re-triggering
             const success = await getWeatherData(event.target.value); // Auto-fetch weather for selected city
             if (success) {
+                void resultsDiv.offsetWidth; // Force reflow to reset animation
+                void forecastDiv.offsetWidth; // Force reflow to reset animation
+                resultsDiv.classList.add('animate'); // Re-add animation class to trigger animation
+                forecastDiv.classList.add('animate--slow'); // Re-add animation class to trigger animation
                 saveToRecentSearches(event.target.value); // Save selected city to recent searches only if fetch was successful
             }
         }
@@ -163,7 +172,12 @@ function displayRecentSearches(recentSearches) {
         cityItem.className = 'recentSearchItem';
         cityItem.addEventListener('click', () => {
             cityInput.value = city; // Fill input with clicked city
+            resultsDiv.classList.remove('animate'); // Remove animation class to allow re-triggering
+            forecastDiv.classList.remove('animate--slow'); // Remove animation class to allow re-triggering
             getWeatherData(city); // Fetch weather for clicked city
+            resultsDiv.classList.add('animate'); // Re-add animation class to trigger animation
+            forecastDiv.classList.add('animate--slow'); // Re-add animation class to trigger animation
+
         });
         recentSearchesList.appendChild(cityItem);
     });
@@ -322,6 +336,7 @@ function displayWeather(data) {
     `;
     resultsDiv.className = `weatherResult ${weatherClass}`;
     resultsDiv.style.display = 'flex';
+    resultsDiv.classList.add('animate');
     getForecastData(name).then(forecastData => { // We can use the city name from the current weather data to fetch the forecast data, which ensures that we are fetching the forecast for the correct location, especially in cases where there might be multiple cities with the same name. This way, we can display the forecast for the exact city that the user searched for, rather than relying on the input value which might not always match perfectly with the API's expected format for city names.
         displayForecast(forecastData, data.sys.sunrise, data.sys.sunset);
     });
