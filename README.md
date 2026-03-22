@@ -37,6 +37,9 @@ Made during National Service on my laptop computer!
 - Graceful fallbacks and user-friendly messages
 - Console logging for debugging
 
+7. Mobile Responsiveness and Animations (added in v1.1)
+- The app now has a mobile responsiveness.
+
 ## Tech Stack
 
 - **Frontend:** HTML5, CSS, Vanilla JavaScript (ES6+)
@@ -52,11 +55,11 @@ Made during National Service on my laptop computer!
 - [ ] Multiple location bookmarks
 - [ ] Weather alerts/notifications
 - [ ] Dark mode toggle
-- [ ] Mobile app version
+- [✔️] Mobile app version
 
 ## Browser Support
 
-Works on all modern browsers (Chrome, Firefox, Safari, Edge)
+Works on all modern browsers (Chrome, Firefox, Safari, Edge), and mobile equivalents
 
 ---
 
