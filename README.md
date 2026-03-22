@@ -63,7 +63,7 @@ Works on all modern browsers (Chrome, Firefox, Safari, Edge), and mobile equival
 
 ---
 
-**Last Updated:** 21 March 2026 (v1.0 complete)
+**Last Updated:** 21 March 2026 (v1.1 complete)
 
 ---
 
