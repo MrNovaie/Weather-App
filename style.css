@@ -21,7 +21,8 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    min-height: 100vh; /* vh = viewport height, makes the body take the full height of the viewport */
+    height: clamp(100vh, 100%, 100vh); /* vh = viewport height, makes the body take the full height of the viewport */
+    
 }
 
 .weatherForm {
@@ -116,7 +117,7 @@ button:active {
 
 .recentSearchItem:hover {
     background-color: #0da38f;
-    transform: scale(1.08);
+    transform: scale(1.05);
     transition:all 0.3s ease; 
 }
 
@@ -134,7 +135,7 @@ button:active {
 
 .historyItem:hover {
     background-color: #0da38f;
-    transform: scale(1.08);
+    transform: scale(1.05);
     transition:all 0.3s ease;
 }
 
@@ -171,6 +172,7 @@ button:active {
     flex-direction: column;
     text-align: center;
 }
+
 
 h1 {
     margin: 0;
@@ -227,7 +229,7 @@ p {
     box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-#timeWidget:hover {
+#timeWidget:hover, #timeWidget:active {
     background: rgba(0, 255, 47, 0.50);
     box-shadow: 3px 4px 12px rgba(6, 33, 0, 0.4);
     transform: scale(1.05);
@@ -244,7 +246,7 @@ p {
     font-size: 1.5rem;
     box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.2);
 }
-#destinationTimeWidget:hover {
+#destinationTimeWidget:hover, #destinationTimeWidget:active {
     background-color: rgba(255, 255, 255, 0.50);
     box-shadow: 3px 4px 12px rgba(85, 0, 0, 0.4);
     transform: scale(1.05);
@@ -263,7 +265,7 @@ p {
 .sunsetDisplay {
     padding: 10px 20px;
     background-color: rgba(255, 230, 0, 0.1);
-    color: #727200;
+    color: #b0b004;
     font-weight: bold;
     font-size: 1.25rem;
     margin-top: 10px;
@@ -375,7 +377,7 @@ p {
     line-height: 1;
 }
 
-.CloseError:hover {
+.CloseError:hover, .CloseError:active {
     color: #000;
 }
 
@@ -445,3 +447,165 @@ p {
   font-style: normal;
 }
 
+/* Add keyframes for animations */
+@keyframes slideInBottom {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Add animations */
+.weatherResult.animate {
+    animation: slideInBottom 0.5s ease-out;
+}
+
+.forecastContainer.animate--slow {
+    animation: slideInBottom 1s ease-out;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    /* Title */
+    h1.weatherTitle {
+        font-size: 2.5rem; /* Down from 5rem */
+        translate: 0 8px; /* Reduce offset */
+        text-align: center;
+    }
+    .titleBackground {
+        margin: 15px; /* Reduce margins */
+        padding: 15px;
+    }
+
+    /* Body & Layout */
+    body {
+        padding: 10px; /* Reduce padding */
+        align-items: stretch; /* Allow full width */
+    }
+
+    /* Form */
+    .weatherForm {
+        margin: 15px 0;
+        width: 100%; /* Full width */
+    }
+    .cityInput {
+        width: 95%; /* Full width */
+        font-size: 1.5rem; /* Down from 2rem */
+        padding: 12px; /* Larger for touch */
+    }
+    .predictionsContainer {
+        min-width: 95%; /* Match input */
+        font-size: 1rem; /* Smaller */
+    }
+    button {
+        width: 100%; /* Full width for submit */
+        padding: 12px; /* Larger touch target */
+        font-size: 1.2rem; /* Down from 1.5rem */
+        margin-top: 10px;
+    }
+
+    /* Recent Searches */
+    .recentSearchesContainer {
+        margin: 10px 0;
+        padding: 10px;
+    }
+    .recentSearchesList {
+        flex-direction: column; /* Stack vertically */
+        gap: 8px;
+    }
+    .recentSearchItem, .historyItem, .clearHistoryBtn {
+        font-size: 1rem; /* Smaller */
+        padding: 10px 15px; /* Larger touch targets */
+    }
+
+    /* Weather Results */
+    .weatherResult {
+        min-width: unset; /* Remove fixed width */
+        width: 95%;
+        padding: 20px; /* Reduce padding */
+        margin-top: 15px;
+    }
+    h1 {
+        font-size: 2rem; /* Down from 3.5rem */
+    }
+    p {
+        font-size: 1.2rem; /* Down from 1.5rem */
+    }
+    .tempDisplay {
+        font-size: 1.5rem; /* Down from 2rem */
+    }
+    .iconDisplay {
+        font-size: 4rem; /* Down from 6rem */
+    }
+    .sunriseDisplay, .sunsetDisplay, .updateTimeDisplay {
+        font-size: 1rem; /* Smaller */
+        padding: 8px 15px;
+    }
+
+    /* Time Widgets - Reposition to bottom for mobile */
+    #timeWidget, #destinationTimeWidget {
+        position: fixed;
+        bottom: 10px; /* Move to bottom */
+        top: unset; /* Remove top */
+        right: 10px;
+        left: 65vw; 
+        width: calc(40% - 50px); /* Full width minus padding */
+        max-height: 30px;
+        font-size: 1rem; /* Smaller */
+        padding: 8px;
+        z-index: 1000;
+        text-align: center; /* Center text */
+    }
+    #destinationTimeWidget {
+        bottom: 50px; /* Stack below user time */
+    }
+
+    /* Forecast */
+    .forecastContainer {
+        min-width: unset; /* Remove fixed width */
+        width: 100%;
+        padding: 15px;
+        margin-top: 20px;
+        display: flex;
+        flex-direction: row; /* Horizontal scroll */
+        overflow-x: auto; /* Allow scrolling */
+        gap: 10px;
+    }
+    .forecastCard {
+        flex-shrink: 0; /* Prevent shrinking */
+        width: 150px; /* Fixed card width for scroll */
+        max-width: fit-content;
+        margin: 0;
+        padding: 15px;
+        text-align: center;
+    }
+    .iconDisplay-forecast {
+        font-size: 2rem; /* Down from 3rem */
+    }
+
+    /* Error Modal */
+    .errorContent {
+        padding: 20px; /* Reduce padding */
+        max-width: 90%; /* Smaller on mobile */
+    }
+    .errorContent h2 {
+        font-size: 1.5rem; /* Smaller */
+    }
+    .errorMessage {
+        font-size: 1rem;
+    }
+    .CloseError {
+        font-size: 1.5rem; /* Smaller */
+    }
+}
+
+/* Optional: Hide time widgets on very small screens if they clutter */
+@media (max-width: 480px) {
+    #timeWidget, #destinationTimeWidget {
+        display: none; /* Or position differently */
+    }
+}
