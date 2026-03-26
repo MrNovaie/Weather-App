@@ -12,9 +12,11 @@ load_dotenv(dotenv_path=os.path.join(basedir, '.env'))
 app = Flask(__name__, instance_relative_config=True, static_folder=os.path.join(basedir, 'static'), template_folder=os.path.join(basedir, 'templates'))
 
 # Check if a URL exists in .env; if not, fall back to your local SQLite path
-default_db = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance', 'project.db')
+db_url = os.getenv('DATABASE_URL')
+if db_url and db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", default_db)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(db_url)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable track modifications to save resources
 db = SQLAlchemy(app)
 
