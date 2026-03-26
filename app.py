@@ -65,7 +65,7 @@ def get_destination():
 
 @app.route('/api/geo', methods=['GET'])
 def geocode():
-    searchTerm = request.args.get('searchTerm')
+    searchTerm = request.args.get('query')
     geo_api_key = os.getenv('GEO_API_KEY')
     if searchTerm:
         url = f'https://api.geoapify.com/v1/geocode/search?text={searchTerm}&apiKey={geo_api_key}'
