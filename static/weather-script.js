@@ -277,7 +277,9 @@ async function getWeatherData(city) {
 async function fetchCitySuggestions(searchTerm) {
     const dropdown = document.querySelector('.predictionsContainer');
     try {
+        console.log('Fetching city suggestions for:', searchTerm);
         const geoApiUrl = `/api/geo?query=${encodeURIComponent(searchTerm)}`;
+        console.log(geoApiUrl)
         const response = await fetch(geoApiUrl);
         console.log(response);
         if (!response.ok) {
