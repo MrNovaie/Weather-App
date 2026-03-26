@@ -23,8 +23,8 @@ db = SQLAlchemy(app)
 #Define model
 class AppState(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    destination_lat = db.Column(db.Float(200), nullable=False)
-    destination_lon = db.Column(db.Float(200), nullable=False)
+    destination_lat = db.Column(db.Float(50), nullable=False) #Must be less than 54 bits as per Render request
+    destination_lon = db.Column(db.Float(50), nullable=False)
 
 
 # Define routes
