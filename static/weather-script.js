@@ -6,8 +6,7 @@ const resultsDiv = document.querySelector('.weatherResult');
 const forecastDiv = document.querySelector('.forecastContainer');
 
 // The weather API calls are now handled by Flask backend routes /api/weather and /api/forecast.
-// We keep geoApiKey if you want to keep client-side autocomplete, or remove if you move it backend too.
-const geoApiKey = '47762054b9f542af8f08c6840e9bab88';
+// So are the geo API calls, with /api/geo
 
 // User timezone detection
 const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Singapore';
