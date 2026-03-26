@@ -10,9 +10,11 @@ const forecastDiv = document.querySelector('.forecastContainer');
 
 // User timezone detection
 const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Singapore';
-let destinationTimeZone = 'UTC'; // Initialize with default
-let timezoneString = 'UTC'; // Initialize with default
-let timezoneOffsetHours = 0; // Initialize with default
+
+// Initialize with default
+let destinationTimeZone = 'UTC';
+let timezoneString = 'UTC';
+let timezoneOffsetHours = 0; 
 
 // Go to map button
 const mapButton = document.querySelector('.mapButton');
@@ -151,7 +153,7 @@ if (weatherForm && cityInput) {
     dropdown.addEventListener('change', async (event) => {
         if (event.target.value) { // Check if a valid option is selected (not the placeholder)
             cityInput.value = event.target.value; // Fill input with selected value
-            dropdown.style.display = 'none'; // Hide dropdown
+            dropdown.style.display = 'none';
             resultsDiv.classList.remove('animate'); // Remove animation class to allow re-triggering
             forecastDiv.classList.remove('animate--slow'); // Remove animation class to allow re-triggering
             const success = await getWeatherData(event.target.value); // Auto-fetch weather for selected city
@@ -277,11 +279,8 @@ async function getWeatherData(city) {
 async function fetchCitySuggestions(searchTerm) {
     const dropdown = document.querySelector('.predictionsContainer');
     try {
-        console.log('Fetching city suggestions for:', searchTerm);
         const geoApiUrl = `/api/geo?query=${encodeURIComponent(searchTerm)}`;
-        console.log(geoApiUrl)
         const response = await fetch(geoApiUrl);
-        console.log(response);
         if (!response.ok) {
             dropdown.style.display = 'none';
             throw new Error('Failed to fetch city suggestions', { cause: response.status });
