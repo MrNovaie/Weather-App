@@ -66,9 +66,13 @@ def get_destination():
 @app.route('/api/geo', methods=['GET'])
 def geocode():
     searchTerm = request.args.get('searchTerm')
+    print(f"Received geocode request for: {searchTerm}")
     geo_api_key = os.getenv('GEO_API_KEY')
+    print(f"Using GEO_API_KEY: {'set' if geo_api_key else 'not set'}")
     url = f'https://api.geoapify.com/v1/geocode/search?text={searchTerm}&apiKey={geo_api_key}'
     response = requests.get(url)
+    print(f"Geocoding API response status: {response.status_code}")
+    print(f"Geocoding API response: {response.json()}")
     if response.status_code != 200:
         return jsonify({'error': 'Geocoding failed'}), response.status_code
     return jsonify(response.json())
