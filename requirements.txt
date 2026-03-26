@@ -4,4 +4,3 @@ requests==2.31.0
 gunicorn
 dotenv
 psycopg2-binary
-flask-sqlalchemy
