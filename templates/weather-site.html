@@ -1,0 +1,43 @@
+<!doctype HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" type = 'text/css' href="{{ url_for('static', filename='weather-style.css') }}">
+    <script src="{{ url_for('static', filename='weather-script.js') }}" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fjalla+One&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class = "titleBackground">
+        <h1 class="weatherTitle">Weather App</h1>
+    </div>
+    <button class="mapButton">Open Map</button>
+    <button class="aboutButton">About</button>
+    <form class = "weatherForm">
+        <input type="text" name="city" class = "cityInput" placeholder = "Enter city" required>
+        <select class = "predictionsContainer" style="display: none;">
+            <option value="">Loading...</option>
+        </select>
+        <button type="submit">Get Weather</button>
+    </form>
+    <div class="recentSearchesContainer" style="display: none;">
+        <h3>Recent Searches</h3>
+        <div class="recentSearchesList"></div>
+        <button class="clearHistoryBtn">Clear History</button>
+    </div>
+    <div class = "weatherResult animate" style ='display:none'>
+    </div>
+    <div class = "forecastContainer animate--slow" style ='display:none'>
+    </div>
+    <div class = "errorModal" style ='display:none'>
+        <div class = "errorContent">
+            <h2>Error ⚠️</h2>
+            <span class = "CloseError">&times;</span>
+            <p class = "errorMessage"></p>
+        </div>
+    </div>
+</body>
+</html>

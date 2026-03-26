@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Weather App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='about.css') }}">
+</head>
+<body>
+    <nav class="header">
+        <a href="{{ url_for('about') }}">About</a>
+        <a href="{{ url_for('weather') }}">Weather</a>
+        <a href="{{ url_for('map') }}">Map</a>
+    </nav>
+    <div class="container">
+        <h1 class="title">About This App</h1>
+        <p>This is a weather and map application built with Flask. It allows you to view weather information and plan routes on a map.</p>
+        <h2 class="feature">Features</h2>
+        <ul class="ul">
+            <li>Current and forecast weather data (24-hour forecast)</li>
+            <li>Interactive map with current and destination locations (updates in real-time)</li>
+            <li>Saves destination coordinates (with database) and autocompletes them</li>
+        </ul>
+    </div>
+    <footer>
+        <p>&copy; 2026 Weather App. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

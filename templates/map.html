@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map</title>
+    <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='map-style.css') }}">
+    <script src="{{ url_for('static', filename='map.js') }}"></script>
+    <title>Map</title>
+</head>
+<body class="stars">
+    <nav class="header">
+        <a href="{{ url_for('map') }}">Map</a>
+        <a href="{{ url_for('weather') }}">Weather</a>
+    </nav>
+    <div class="container">
+        <h1 class="titleBackground">Welcome to Map</h1>
+        <p>This will display your <strong>current location</strong> on the map, and the <strong>destination location</strong> on the second map.</p>
+    </div>
+    <section>
+        <div class="box">
+            <h1>Current Location</h1>
+            <p id="current-location-info"></p>
+        </div>
+        <div id ="map_current" class="map_current"></div>
+    </section>
+    <section>
+        <div class="box">
+            <h1>Destination Location</h1>
+            <p id="location-info"></p>
+        </div>
+        <div id="map" class="map"></div>
+    </section>
+</body>
+</html>
