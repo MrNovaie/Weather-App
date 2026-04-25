@@ -58,7 +58,7 @@ function initdestinationMap() {
 
 async function updatedestinationMap() {
     try {
-        const response = await fetch('/get_destination');
+        const response = await fetch('/api/get_destination');
         const data = await response.json();
         console.log('Received destination data:', data); // Debugging log
         

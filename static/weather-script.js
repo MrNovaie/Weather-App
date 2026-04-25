@@ -360,14 +360,26 @@ function displayWeather(data) {
         displayForecast(forecastData, data.sys.sunrise, data.sys.sunset);
     });
     console.log('JSON.stringify({ lat: coord.lat, lon: coord.lon }):', JSON.stringify({ lat: coord.lat, lon: coord.lon })); // Debugging log to check the coordinates being sent to the backend
-    fetch('/update_destination', {
+    fetch('/api/update_destination', {
         method: 'POST',
         headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ lat: coord.lat, lon: coord.lon }) // Send the coordinates to the backend to update the map,
         })
-        .then(response => response.json())
+        .then(async (response) => {
+            const text = await response.text();
+            let payload;
+            try {
+                payload = JSON.parse(text);
+            } catch {
+                throw new Error(`Expected JSON, got HTTP ${response.status}: ${text.slice(0, 120)}`);
+            }
+            if (!response.ok) {
+                throw new Error(payload.error || `HTTP ${response.status}`);
+            }
+            return payload;
+        })
         .then(data => {
             console.log('Destination set on backend:', data);
         })

@@ -3,6 +3,7 @@ import os
 import requests
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+from sqlalchemy.exc import SQLAlchemyError
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -54,26 +55,57 @@ def weather():
 def map():
     return render_template('map.html')
 
-@app.route('/update_destination', methods=['POST'])
+@app.route('/update_destination', methods=['GET', 'POST', 'OPTIONS'], strict_slashes=False)
+@app.route('/api/update_destination', methods=['GET', 'POST', 'OPTIONS'], strict_slashes=False)
 def update_destination():
-    data = request.get_json() # Get the new destination from the request data
-    state = AppState.query.first() # Check if there's an existing state in the database
-    if state:
-        state.destination_lat = data.get('lat', 1.3521)
-        state.destination_lon = data.get('lon', 103.8198) 
-    else:
-        state = AppState(destination_lat=data.get('lat', 1.3521), destination_lon=data.get('lon', 103.8198)) # Create a new state if it doesn't exist
-        db.session.add(state) #add the new state to the database
-    db.session.commit() # Commit the changes to the database
-    return jsonify({'message': 'Destination updated successfully', 'destination_lat': data.get('lat', 1.3521), 'destination_lon': data.get('lon', 103.8198)})
+    """POST JSON {lat, lon}. GET/OPTIONS return JSON (not HTML) so clients never parse <!doctype> errors."""
+    if request.method == 'OPTIONS':
+        r = jsonify({})
+        r.status_code = 204
+        r.headers['Allow'] = 'POST, OPTIONS'
+        return r
+    if request.method == 'GET':
+        return jsonify({
+            'error': 'Method not allowed: use POST with Content-Type: application/json',
+            'body': {'lat': 'number', 'lon': 'number'},
+        }), 405
+    data = request.get_json(silent=True)
+    if data is None or not isinstance(data, dict):
+        return jsonify({'error': 'Send JSON: {"lat": number, "lon": number}'}), 400
+    lat = data.get('lat', 1.3521)
+    lon = data.get('lon', 103.8198)
+    try:
+        state = AppState.query.first()
+        if state:
+            state.destination_lat = lat
+            state.destination_lon = lon
+        else:
+            db.session.add(AppState(destination_lat=lat, destination_lon=lon))
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+        return jsonify({'error': 'Could not save destination (database error)'}), 500
+    return jsonify({
+        'message': 'Destination updated successfully',
+        'destination_lat': lat,
+        'destination_lon': lon,
+    })
 
 
-@app.route('/get_destination', methods=['GET'])
+@app.route('/get_destination', methods=['GET', 'POST', 'OPTIONS'], strict_slashes=False)
+@app.route('/api/get_destination', methods=['GET', 'POST', 'OPTIONS'], strict_slashes=False)
 def get_destination():
-    state = AppState.query.first() 
+    if request.method == 'OPTIONS':
+        r = jsonify({})
+        r.status_code = 204
+        r.headers['Allow'] = 'GET, OPTIONS'
+        return r
+    if request.method == 'POST':
+        return jsonify({'error': 'Method not allowed: use GET for current destination'}), 405
+    state = AppState.query.first()
     if state:
         return jsonify({'destination_lat': state.destination_lat, 'destination_lon': state.destination_lon})
-    return jsonify({'destination_lat': 1.3521, 'destination_lon': 103.8198})  # Return default coordinates if no state is found
+    return jsonify({'destination_lat': 1.3521, 'destination_lon': 103.8198})
 
 @app.route('/api/geo', methods=['GET'])
 def geocode():
