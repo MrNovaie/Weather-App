@@ -95,17 +95,23 @@ def get_weather():
     lat = request.args.get('lat')
     lon = request.args.get('lon')
     api_key = os.getenv('OPENWEATHER_API_KEY')
+    if not api_key:
+        return jsonify({'error': 'OPENWEATHER_API_KEY is not set'}), 503
 
     if city:
-        url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric'
+        url = f'https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric'
     elif lat and lon:
-        url = f'http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric'
+        url = f'https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric'
     else:
         return jsonify({'error': 'City or lat/lon required'}), 400
 
     response = requests.get(url)
     if response.status_code != 200:
-        return jsonify({'error': 'Weather data fetch failed'}), response.status_code
+        return jsonify({
+            'error': 'Weather data fetch failed',
+            'upstream_status': response.status_code,
+            'upstream_body': response.text[:500],
+        }), response.status_code
     return jsonify(response.json())
 
 
@@ -115,17 +121,23 @@ def get_forecast():
     lat = request.args.get('lat')
     lon = request.args.get('lon')
     api_key = os.getenv('OPENWEATHER_API_KEY')
+    if not api_key:
+        return jsonify({'error': 'OPENWEATHER_API_KEY is not set'}), 503
 
     if city:
-        url = f'http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={api_key}&units=metric'
+        url = f'https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={api_key}&units=metric'
     elif lat and lon:
-        url = f'http://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric'
+        url = f'https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric'
     else:
         return jsonify({'error': 'City or lat/lon required'}), 400
 
     response = requests.get(url)
     if response.status_code != 200:
-        return jsonify({'error': 'Forecast data fetch failed'}), response.status_code
+        return jsonify({
+            'error': 'Forecast data fetch failed',
+            'upstream_status': response.status_code,
+            'upstream_body': response.text[:500],
+        }), response.status_code
     return jsonify(response.json())
 
 
