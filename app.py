@@ -37,8 +37,8 @@ db = SQLAlchemy(app)
 #Define model
 class AppState(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    destination_lat = db.Column(db.Float(50), nullable=False)
-    destination_lon = db.Column(db.Float(50), nullable=False)
+    destination_lat = db.Column(db.Float, nullable=False)
+    destination_lon = db.Column(db.Float, nullable=False)
 
 
 # Define routes
@@ -102,7 +102,16 @@ def get_destination():
         return r
     if request.method == 'POST':
         return jsonify({'error': 'Method not allowed: use GET for current destination'}), 405
-    state = AppState.query.first()
+    try:
+        state = AppState.query.first()
+    except SQLAlchemyError:
+        app.logger.exception('get_destination failed')
+        return jsonify({
+            'error': 'Database error reading destination',
+            'hint': 'Attach Heroku Postgres, set DATABASE_URL, redeploy, or check release logs for db.create_all failures.',
+            'destination_lat': 1.3521,
+            'destination_lon': 103.8198,
+        }), 503
     if state:
         return jsonify({'destination_lat': state.destination_lat, 'destination_lon': state.destination_lon})
     return jsonify({'destination_lat': 1.3521, 'destination_lon': 103.8198})
@@ -198,12 +207,18 @@ def api_debug():
 
 
 def init_db():
-    """Create tables if they do not exist (local dev or one-off use)."""
+    """Create tables if they do not exist (local dev, release phase, or Gunicorn import)."""
     with app.app_context():
         db.create_all()
 
 
+# Gunicorn imports this module without running __main__; ensure tables exist on Heroku web dynos too.
+try:
+    init_db()
+except SQLAlchemyError:
+    app.logger.exception('init_db failed at import (DB may be misconfigured until fixed)')
+
+
 # Run the application
 if __name__ == '__main__':
-    init_db()
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=os.getenv('FLASK_DEBUG', 'true').lower() in ('1', 'true', 'yes'))
