@@ -3,13 +3,14 @@
 A full-stack web application built with Flask that combines weather forecasting and interactive mapping. Users can search for weather in any city, view current location on a map, set destinations, and get forecasts. Perfect for travelers, developers, or anyone needing integrated weather and map tools.
 
 ## Features
+
 - **Weather Search**: Get current weather and 5-day forecast for any city using OpenWeatherMap API.
 - **Interactive Maps**: View maps with MapLibre GL, geolocation for current position, and click to set destinations.
 - **Directions & Routing**: Get driving directions between current location and destination using Mapbox API.
 - **Geolocation**: Automatically detect and display weather for your current location.
 - **Time Zone Display**: Show current time and destination time with proper time zones.
 - **Recent Searches**: Save and view up to 5 recent weather searches.
-- **Destination Persistence**: Save destination coordinates in SQLite database across sessions.
+- **Destination Persistence**: Save destination coordinates in a database (SQLite locally, Postgres on Heroku).
 - **Responsive Design**: Works on desktop and mobile with CSS media queries.
 - **API Endpoints**: Backend routes for weather, forecast, directions, and debug info.
 - **Responsive Design**: Works on desktop and mobile with CSS media queries.
@@ -17,13 +18,15 @@ A full-stack web application built with Flask that combines weather forecasting 
 - **Recent Searches**: Save and view recent weather searches.
 
 ## Tech Stack
+
 - **Backend**: Flask, SQLAlchemy, Python
 - **Frontend**: HTML, CSS, JavaScript, MapLibre GL
 - **APIs**: OpenWeatherMap, Mapbox (for routing if added), Geocoding API
-- **Database**: SQLite
-- **Deployment**: Ready for Heroku/Railway
+- **Database**: SQLite (local dev), Heroku Postgres (production)
+- **Deployment**: Heroku (Gunicorn + release-phase DB init); also suitable for Railway etc.
 
 ## Installation
+
 1. Clone or download the repository.
 2. Install Python 3.8+.
 3. Create a virtual environment: `python -m venv venv`
@@ -32,15 +35,84 @@ A full-stack web application built with Flask that combines weather forecasting 
 6. Set up environment variables: Copy `.env.example` to `.env` and add your API keys:
    - `OPENWEATHER_API_KEY=your_key_here`
    - `GEO_API_KEY=your_key_here`
+   - `MAPBOX_ACCESS_TOKEN=your_token_here` (optional for routing)
 7. Run: `python app.py`
 8. Open `http://localhost:5000` in browser.
 
 ## Usage
+
 - Home: About page.
 - Weather: Enter city, get weather/forecast.
 - Map: View current location, click to set destination.
 
+## Heroku deployment
+
+Prerequisites: [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli), Git, a Heroku account.
+
+1. **Log in** (once): `heroku login`
+2. **Create the app** (pick a unique name or omit `--app` to get a random name):
+
+   ```bash
+   heroku create your-app-name
+   ```
+
+3. **Add Postgres** (Heroku sets `DATABASE_URL` automatically):
+
+   ```bash
+   heroku addons:create heroku-postgresql:essential-0 --app your-app-name
+   ```
+
+   Use another plan tier if you prefer; any Heroku Postgres plan works.
+
+4. **Set config vars** (replace values with your real keys):
+
+   ```bash
+   heroku config:set OPENWEATHER_API_KEY=your_key GEO_API_KEY=your_geoapify_key --app your-app-name
+   heroku config:set MAPBOX_ACCESS_TOKEN=your_mapbox_token --app your-app-name
+   ```
+
+   Optional: `heroku config:set FLASK_ENV=production --app your-app-name`
+
+5. **Deploy** from this repo. If `heroku create` did not add a Git remote: `heroku git:remote -a your-app-name`. Then push your deploy branch (Heroku often uses `main`):
+
+   ```bash
+   git push heroku main
+   ```
+
+   If your local default branch is still `master`: `git push heroku master:main`.
+
+6. **Release phase**: On each deploy, Heroku runs `release: python release.py`, which calls `db.create_all()` so tables exist before web dynos start.
+
+7. **Scale web** (if needed): `heroku ps:scale web=1 --app your-app-name`
+
+8. **Open the site**: `heroku open --app your-app-name`
+
+### How it runs on Heroku
+
+- **Procfile**: `web` runs `gunicorn app:app`; `release` runs [`release.py`](release.py) for DB setup.
+- **runtime.txt**: Pins the Python version for repeatable builds.
+- **[app.py](app.py)**: Normalizes `DATABASE_URL` (`postgres://` → `postgresql://`) and appends `sslmode=require` when running on a Heroku dyno (`DYNO` is set).
+
+### Post-deploy checks
+
+- Pages: `/`, `/weather`, `/map`
+- APIs: `/api/weather?city=London`, `/api/forecast?city=London`, `/api/geo?query=Paris` (with keys set)
+- Map destination persistence: `POST /update_destination` with JSON `{"lat":1.35,"lon":103.82}`, then `GET /get_destination`; restart dynos (`heroku restart`) and confirm values still load from Postgres.
+- Logs: `heroku logs --tail --app your-app-name`
+
+## Screenshots
+
+(Add screenshots here: home page, weather page, map page)
+
 ## Requirements
+
 - Python 3.8+
 - API Keys: Get from OpenWeatherMap.org (free), Geocoding API, Mapbox.com (free tier)
 
+## License
+
+Sold as-is. No warranties. Buyer assumes all responsibility.
+
+## Price: $500
+
+Includes full source code, setup guide, and support for basic setup questions.
