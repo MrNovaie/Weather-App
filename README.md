@@ -100,19 +100,3 @@ Prerequisites: [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli), G
 - Map destination persistence: `POST /update_destination` with JSON `{"lat":1.35,"lon":103.82}`, then `GET /get_destination`; restart dynos (`heroku restart`) and confirm values still load from Postgres.
 - Logs: `heroku logs --tail --app your-app-name`
 
-## Screenshots
-
-(Add screenshots here: home page, weather page, map page)
-
-## Requirements
-
-- Python 3.8+
-- API Keys: Get from OpenWeatherMap.org (free), Geocoding API, Mapbox.com (free tier)
-
-## License
-
-Sold as-is. No warranties. Buyer assumes all responsibility.
-
-## Price: $500
-
-Includes full source code, setup guide, and support for basic setup questions.
